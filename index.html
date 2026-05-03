@@ -38,11 +38,12 @@
     font-weight: 300;
     min-height: 100vh;
     overflow-x: hidden;
+    padding-top: env(safe-area-inset-top);
   }
 
   /* ── HEADER ── */
   header {
-    padding: calc(40px + env(safe-area-inset-top)) 40px 0;
+    padding: calc(20px + env(safe-area-inset-top)) 40px 0;
     display: flex;
     align-items: flex-end;
     justify-content: space-between;
@@ -562,7 +563,7 @@
 
   /* ── RESPONSIVE / MOBILE ── */
   @media (max-width: 600px) {
-    header { padding: 20px 16px 16px; gap: 10px; }
+    header { padding: calc(12px + env(safe-area-inset-top)) 16px 16px; gap: 10px; }
     .logo { font-size: 1.4rem; }
     .subtitle { font-size: 0.62rem; }
     .stat-n { font-size: 1.2rem; }
