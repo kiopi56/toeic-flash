@@ -717,7 +717,6 @@
     <div class="flash-en" id="flash-en"></div>
     <div class="flash-divider" id="flash-divider"></div>
     <div class="flash-ja" id="flash-ja"></div>
-    <div class="flash-hint" id="flash-hint">タップして和訳を見る</div>
     <div class="flash-actions" id="flash-actions">
       <button class="flash-btn wrong" id="btn-wrong">✗ もう一度</button>
       <button class="flash-speak-btn" id="btn-flash-speak">🔊 読み上げ</button>
@@ -803,6 +802,7 @@ let flashIdx = 0;
 let flashRevealed = false;
 let flashList = [...sentences];
 let autoSpeak = true;
+let speakSession = 0;
 let speechRate = 0.9;
 
 // ── SPEECH ──
@@ -960,37 +960,34 @@ function renderFlash() {
   if (flashList.length === 0) return;
   if (flashIdx >= flashList.length) flashIdx = flashList.length - 1;
   const s = flashList[flashIdx];
-  flashRevealed = false;
+  flashRevealed = true;
   document.getElementById('flash-counter').textContent = (flashIdx+1) + ' / ' + flashList.length;
   document.getElementById('flash-num').textContent = '#' + String(s.id).padStart(2,'0');
   document.getElementById('flash-en').textContent = s.en;
   document.getElementById('flash-ja').textContent = s.ja;
   document.getElementById('flash-tags').innerHTML = s.cats.map(c => `<span class="tag">${c}</span>`).join('');
-  document.getElementById('flash-divider').classList.remove('shown');
-  document.getElementById('flash-ja').classList.remove('shown');
-  document.getElementById('flash-actions').classList.remove('shown');
-  document.getElementById('flash-hint').style.display = 'block';
-  document.getElementById('btn-prev').disabled = flashIdx === 0;
-  document.getElementById('btn-next').disabled = flashIdx === flashList.length - 1;
-
-  // auto speak：日本語→英語
-  if (autoSpeak) {
-    window.speechSynthesis.cancel();
-    setTimeout(() => speakJaThenEn(s.ja, s.en), 300);
-  }
-}
-
-function revealFlash() {
-  if (flashRevealed) return;
-  flashRevealed = true;
   document.getElementById('flash-divider').classList.add('shown');
   document.getElementById('flash-ja').classList.add('shown');
   document.getElementById('flash-actions').classList.add('shown');
-  document.getElementById('flash-hint').style.display = 'none';
+  document.getElementById('btn-prev').disabled = flashIdx === 0;
+  document.getElementById('btn-next').disabled = flashIdx === flashList.length - 1;
+
+  // auto speak：日本語→英語、完了後に次のカードへ自動進行
+  if (autoSpeak) {
+    const session = ++speakSession;
+    window.speechSynthesis.cancel();
+    setTimeout(async () => {
+      await speakJaThenEn(s.ja, s.en);
+      await new Promise(r => setTimeout(r, 700));
+      if (autoSpeak && session === speakSession && flashIdx < flashList.length - 1) {
+        flashIdx++;
+        renderFlash();
+      }
+    }, 300);
+  }
 }
 
 // ── EVENTS ──
-document.getElementById('flash-card').addEventListener('click', revealFlash);
 
 // flash speak button（日本語→英語）
 document.getElementById('btn-flash-speak').addEventListener('click', e => {
@@ -1002,6 +999,7 @@ document.getElementById('btn-flash-speak').addEventListener('click', e => {
 // auto speak toggle
 document.getElementById('btn-speak-auto').addEventListener('click', e => {
   autoSpeak = !autoSpeak;
+  if (!autoSpeak) { speakSession++; window.speechSynthesis.cancel(); }
   e.currentTarget.textContent = `🔊 自動再生: ${autoSpeak ? 'ON' : 'OFF'}`;
   e.currentTarget.style.borderColor = autoSpeak ? 'var(--accent)' : '';
   e.currentTarget.style.color = autoSpeak ? 'var(--accent)' : '';
@@ -1014,6 +1012,7 @@ document.getElementById('speed-slider').addEventListener('input', e => {
 });
 
 document.getElementById('btn-ok').addEventListener('click', () => {
+  speakSession++;
   const s = flashList[flashIdx];
   mastered.add(s.id);
   saveMastered();
@@ -1022,6 +1021,7 @@ document.getElementById('btn-ok').addEventListener('click', () => {
 });
 
 document.getElementById('btn-wrong').addEventListener('click', () => {
+  speakSession++;
   const s = flashList[flashIdx];
   mastered.delete(s.id);
   saveMastered();
@@ -1030,10 +1030,12 @@ document.getElementById('btn-wrong').addEventListener('click', () => {
 });
 
 document.getElementById('btn-prev').addEventListener('click', () => {
+  speakSession++;
   if (flashIdx > 0) { flashIdx--; renderFlash(); }
 });
 
 document.getElementById('btn-next').addEventListener('click', () => {
+  speakSession++;
   if (flashIdx < flashList.length - 1) { flashIdx++; renderFlash(); }
 });
 
