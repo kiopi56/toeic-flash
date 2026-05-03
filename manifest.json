@@ -2,7 +2,7 @@
   "name": "TOEIC 600 Flash",
   "short_name": "TOEIC Flash",
   "description": "TOEIC600点のための必須英文50本暗記アプリ",
-  "start_url": "./toeic600.html",
+  "start_url": "./index.html",
   "display": "standalone",
   "background_color": "#0d0d0d",
   "theme_color": "#0d0d0d",

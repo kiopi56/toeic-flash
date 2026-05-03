@@ -1,6 +1,6 @@
 const CACHE = 'toeic600-v1';
 const ASSETS = [
-  './toeic600.html',
+  './index.html',
   './manifest.json',
   'https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;1,400&family=DM+Mono:wght@400;500&family=Noto+Sans+JP:wght@300;400;500&display=swap',
 ];
