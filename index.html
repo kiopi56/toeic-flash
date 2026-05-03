@@ -726,7 +726,7 @@
   </div>
   <div class="flash-nav">
     <button class="nav-btn" id="btn-prev">← 前へ</button>
-    <button class="nav-btn" id="btn-speak-auto" title="カード表示時に自動読み上げ">🔊 自動再生: OFF</button>
+    <button class="nav-btn" id="btn-speak-auto" title="カード表示時に自動読み上げ" style="border-color:var(--accent);color:var(--accent)">🔊 自動再生: ON</button>
     <button class="nav-btn" id="btn-next">次へ →</button>
   </div>
 </div>
@@ -802,7 +802,7 @@ let searchQ = '';
 let flashIdx = 0;
 let flashRevealed = false;
 let flashList = [...sentences];
-let autoSpeak = false;
+let autoSpeak = true;
 let speechRate = 0.9;
 
 // ── SPEECH ──
